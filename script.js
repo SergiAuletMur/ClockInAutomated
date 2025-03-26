@@ -8,6 +8,7 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     // Format the clock-in and clock-out times
     const clockInValue = clockInTime.toFormat("yyyy-MM-dd'T'HH:mm");
     const clockOutValue = clockOutTime.toFormat("yyyy-MM-dd'T'HH:mm");
+    let noErrors = true;
 
     // Select the Clock In input field and set the value
     await page.fill('input[type="datetime-local"]', clockInValue);
@@ -17,13 +18,12 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
 
     await page.waitForTimeout(1000);
 
-
     // Check if any error message appears
     const errorMessages = await page.locator('div[data-testid="error-message-text"]').all();
     for (const errorMessage of errorMessages) {
         const text = await errorMessage.textContent();
         console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
-        return false; // Skip entry if any error is found
+        noErrors = false;
     }
 
     // Select the Clock Out input field and set the value
@@ -41,10 +41,10 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     for (const errorMessage of errorMessagesAfterClockOut) {
         const text = await errorMessage.textContent();
         console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
-        return false; // Skip entry if any error is found
+        noErrors = false;
     }
 
-    return true; // Successfully filled Clock In and Clock Out
+    return noErrors; // Successfully filled Clock In and Clock Out
 }
 
 (async () => {
@@ -114,6 +114,21 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
         const success1 = await fillClockInOut(page, date, clockInTime1, clockOutTime1);
         if (!success1) continue; // Skip if there was an error
 
+        // Click on the "Workday" button after filling in the clock-in and clock-out inputs
+        const workdayButton1 = page.locator('span[data-testid="button-select-button"]:has-text("Workday")');
+        await workdayButton1.click();
+        console.log(`Clicked Workday button for ${dateString}`);
+
+        // Click on the "Save" button after clicking Workday
+        const saveButton1 = await page.waitForSelector('button:has(span:has-text("Save"))');
+        await saveButton1.click();
+        console.log("Clicked Save button");
+        await page.waitForTimeout(2000);
+        console.log("Waiting 2 seconds to entry be saved");
+        const addButton1 = await page.waitForSelector('button:has-text("Add")');
+        await addButton1.click();
+        console.log("Clicked Add button");
+
         // Second time with different clock-in and clock-out values
         const clockInTime2 = date.set({ hour: 13, minute: 20, second: 0 });
         const clockOutTime2 = date.set({ hour: 16, minute: 50, second: 0 });
@@ -122,12 +137,12 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
         if (!success2) continue; // Skip if there was an error
 
         // Click on the "Workday" button after filling in the clock-in and clock-out inputs
-        const workdayButton = await page.waitForSelector('span[data-testid="text-type-display-span"]:has-text("Workday")');
+        const workdayButton = page.locator('span[data-testid="button-select-button"]:has-text("Workday")');
         await workdayButton.click();
         console.log(`Clicked Workday button for ${dateString}`);
 
         // Click on the "Save" button after clicking Workday
-        const saveButton = await page.waitForSelector('span.b-jss1008');
+        const saveButton = await page.waitForSelector('button:has(span:has-text("Save"))');
         await saveButton.click();
         console.log("Clicked Save button");
 
@@ -137,9 +152,6 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
         await addButton.click();
         console.log("Clicked Add button");
     }
-
-    // Keep browser open for interaction
-    await page.waitForTimeout(60000); // Keeps open for 60 seconds
 
     await browser.close();
 })();
