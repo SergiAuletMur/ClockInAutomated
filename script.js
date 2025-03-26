@@ -22,10 +22,10 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     const errorMessages = await page.locator('div[data-testid="error-message-text"]').all();
     for (const errorMessage of errorMessages) {
         const text = await errorMessage.textContent();
-        console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
         if(text.includes("Clock Out cannot be earlier than Clock In. Please adjust the time")) {
             noErrors = true;
         } else {
+            console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
             noErrors = false;
         }
     }
@@ -44,16 +44,13 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     const errorMessagesAfterClockOut = await page.locator('div[data-testid="error-message-text"]').all();
     for (const errorMessage of errorMessagesAfterClockOut) {
         const text = await errorMessage.textContent();
-        console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
         if(text.includes("Clock Out cannot be earlier than Clock In. Please adjust the time")) {
             noErrors = true;
         } else {
+            console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
             noErrors = false;
         }
     }
-
-    await page.waitForTimeout(10000);
-
 
     return noErrors; // Successfully filled Clock In and Clock Out
 }
