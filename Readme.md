@@ -13,6 +13,8 @@ The script:
 - Waits for manual completion of the Google 2-Step Verification (if enabled).
 - Iterates through each weekday of the current month and fills in clock-in and clock-out times.
 - Saves each entry automatically.
+- Skips weekend days
+- Skip save entry if any error appears after inputing the clock date (I half tested this, so this is not 100% fiable)
 
 ## ⚙️ Customization
 
