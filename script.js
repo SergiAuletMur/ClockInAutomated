@@ -23,7 +23,11 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     for (const errorMessage of errorMessages) {
         const text = await errorMessage.textContent();
         console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
-        noErrors = false;
+        if(text.includes("Clock Out cannot be earlier than Clock In. Please adjust the time")) {
+            noErrors = true;
+        } else {
+            noErrors = false;
+        }
     }
 
     // Select the Clock Out input field and set the value
@@ -41,8 +45,15 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     for (const errorMessage of errorMessagesAfterClockOut) {
         const text = await errorMessage.textContent();
         console.log(`Skipping ${date.toISODate()} due to an error: ${text}`);
-        noErrors = false;
+        if(text.includes("Clock Out cannot be earlier than Clock In. Please adjust the time")) {
+            noErrors = true;
+        } else {
+            noErrors = false;
+        }
     }
+
+    await page.waitForTimeout(10000);
+
 
     return noErrors; // Successfully filled Clock In and Clock Out
 }
