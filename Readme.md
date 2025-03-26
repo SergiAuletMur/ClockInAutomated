@@ -1,5 +1,6 @@
 # Clock In/Out Automation Script
 ⚠️ Code is a mess not optimized and not refactored, this was just done to save time so don't take the code quality too serious 🐈‍⬛ ⚠️
+⚠️ Also there can be bugs as this was quickly implemented without a QA phase 😕 ⚠️
 
 This script automates the process of clocking in and out using Playwright. It was created to simplify the tedious manual process of time tracking.
 
