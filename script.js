@@ -4,6 +4,8 @@ const { DateTime } = require('luxon');
 const USER_EMAIL = "sergi.aulet@launchmetrics.com";
 const USER_PASSWORD = "yourpasswordhere";
 
+const nextButtonLabels = ["Next", "Siguiente", "Següent"];
+
 async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     // Format the clock-in and clock-out times
     const clockInValue = clockInTime.toFormat("yyyy-MM-dd'T'HH:mm");
@@ -63,20 +65,41 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     await emailInput.fill(USER_EMAIL);
     console.log("Entered email");
 
-    // Click the Next button
-    const nextButton = await page.waitForSelector('button:has-text("Next")');
-    await nextButton.click();
-    console.log("Clicked Next button");
+    let nextButton;
+    for (const label of nextButtonLabels) {
+        nextButton = await page.locator(`button:has-text("${label}")`).first();
+        if (await nextButton.isVisible()) {
+          break;
+        }
+    }
+
+    if (nextButton) {
+        await nextButton.click();
+        console.log("Clicked Next button");
+    } else {
+        throw("Next button not found, please try commenting the google login part and try again doing it manually");
+    }
 
     // Wait for the password input field and type the password
     const passwordInput = await page.waitForSelector('input[name="Passwd"]');
     await passwordInput.fill(USER_PASSWORD);
     console.log("Entered password");
 
+    let passwordNextButton;
+    for (const label of nextButtonLabels) {
+        passwordNextButton = await page.locator(`button:has-text("${label}")`).first();
+        if (await nextButton.isVisible()) {
+          break;
+        }
+    }
+
     // Click the Next button after entering password
-    const passwordNextButton = await page.waitForSelector('button:has-text("Next")');
-    await passwordNextButton.click();
-    console.log("Clicked Next button after password");
+    if (passwordNextButton) {
+        await passwordNextButton.click();
+        console.log("Clicked password Next button");
+      } else {
+        throw("Password Next button not found, please try commenting the google login part and try again doing it manually");
+      }
 
     // Wait for manual step and redirection
     console.log("Waiting for manual step and redirection...");
