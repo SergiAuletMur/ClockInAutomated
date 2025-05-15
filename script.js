@@ -111,7 +111,7 @@ async function fillClockInOut(page, date, clockInTime, clockOutTime) {
     const endOfMonth = now.endOf('month'); // Last day of the current month
 
     // Click the Add button
-    const addButton = await page.waitForSelector('button:has-text("Add")');
+    const addButton = await page.waitForSelector('button[aria-label="Add"]');
     await addButton.click();
     console.log("Clicked Add button");
     // Loop through each day of the month
